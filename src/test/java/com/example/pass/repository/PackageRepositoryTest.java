@@ -4,6 +4,7 @@ import com.example.pass.repository.packaze.PackageEntity;
 import com.example.pass.repository.packaze.PackageRepository;
 import java.time.LocalDateTime;
 import java.util.List;
+import java.util.Optional;
 import lombok.extern.slf4j.Slf4j;
 
 import org.junit.jupiter.api.Test;
@@ -14,6 +15,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.test.context.ActiveProfiles;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 
 @Slf4j
@@ -72,5 +74,25 @@ public class PackageRepositoryTest {
 
         //when
         int updatedCount = packageRepository.updateCountAndPeriod(packageEntity.getPackageSeq(),30,120);
+        final PackageEntity updatedPackageEntity = packageRepository.findById(
+            packageEntity.getPackageSeq()).get();
+
+        //then
+        assertEquals(1,updatedCount);
+        assertEquals(30, updatedPackageEntity.getCount().intValue());
+        assertEquals(120,updatedPackageEntity.getPeriod().intValue());
+    }
+    @Test
+    public void test_delete(){
+        //given
+        PackageEntity packageEntity = new PackageEntity();
+        packageEntity.setPackageName("제거할 이용권");
+        packageEntity.setCount(1);
+        PackageEntity newPackgeEntity = packageRepository.save(packageEntity);
+
+        //when
+        packageRepository.deleteById(newPackgeEntity.getPackageSeq());
+        //then
+        assertTrue(packageRepository.findById(newPackgeEntity.getPackageSeq()).isEmpty());
     }
 }
